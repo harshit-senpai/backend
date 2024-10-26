@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.verifyOrder = exports.createOrder = void 0;
+exports.getUserOrders = exports.verifyOrder = exports.createOrder = void 0;
 const crypto_1 = __importDefault(require("crypto"));
 const razorpay_1 = __importDefault(require("razorpay"));
 const db_1 = require("../lib/db");
@@ -144,3 +144,32 @@ const verifyOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
 });
 exports.verifyOrder = verifyOrder;
+const getUserOrders = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { userId } = req.params;
+        const orders = yield db_1.db.user.findUnique({
+            where: {
+                id: userId,
+            },
+            include: {
+                orders: {
+                    include: {
+                        orderItems: {
+                            include: {
+                                product: true,
+                            },
+                        },
+                    },
+                },
+            },
+        });
+        res.status(200).json({ data: orders });
+    }
+    catch (error) {
+        console.log("[ORDER_GET]", error);
+        res.status(500).json({
+            message: "Internal server error",
+        });
+    }
+});
+exports.getUserOrders = getUserOrders;
