@@ -1,0 +1,134 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum Discount {
+  NONE
+  PERCENT_20
+  PERCENT_30
+  PERCENT_40
+  PERCENT_50
+}
+
+model Category {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  image     Image[]
+  products  Product[] @relation("ProductToCategory")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Size {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  value     String
+  products  Product[] @relation("ProductToSize")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Image {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  url        String
+  categoryId String?   @db.ObjectId
+  category   Category? @relation(fields: [categoryId], references: [id])
+  productId  String?   @db.ObjectId
+  product    Product?  @relation(fields: [productId], references: [id])
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+}
+
+model Product {
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  description   String
+  sellingPoint  String
+  price         Int
+  stock         Int         @default(0)
+  isFeatured    Boolean     @default(false)
+  isArchived    Boolean     @default(false)
+  isBestSeller  Boolean     @default(false)
+  isDisscounted Discount    @default(NONE)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  categoryId    String      @db.ObjectId
+  category      Category    @relation("ProductToCategory", fields: [categoryId], references: [id])
+  sizeId        String      @db.ObjectId
+  size          Size        @relation("ProductToSize", fields: [sizeId], references: [id])
+  images        Image[]
+  orderItems    OrderItem[]
+
+  @@index([categoryId])
+  @@index([sizeId])
+}
+
+model Order {
+  id              String      @id @default(auto()) @map("_id") @db.ObjectId
+  razorpayOrderId String
+  customerName    String
+  customerEmail   String
+  customerPhone   String
+  isPaid          Boolean     @default(false)
+  address         String
+  city            String
+  state           String
+  country         String
+  pincode         String
+  userId          String      @db.ObjectId
+  user            User        @relation(fields: [userId], references: [id])
+  orderItems      OrderItem[]
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+model OrderItem {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  orderId   String   @db.ObjectId
+  order     Order    @relation(fields: [orderId], references: [id])
+  productId String   @db.ObjectId
+  product   Product  @relation(fields: [productId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+model User {
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  email        String    @unique
+  phone        String
+  image        String?
+  hashPassword String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  favoriteIds  String[]  @db.ObjectId
+  Address      Address[]
+  orders       Order[]
+}
+
+model Address {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String   @db.ObjectId
+  user        User     @relation(fields: [userId], references: [id])
+  fulladdress String
+  city        String
+  state       String
+  country     String
+  pincode     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
