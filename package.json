@@ -6,7 +6,8 @@
   "scripts": {
     "watch": "tsc -w",
     "server": "node dist/server.js",
-    "dev": "concurrently \"npm run watch\" \"npm run server\""
+    "dev": "concurrently \"npm run watch\" \"npm run server\"",
+    "postinstall": "prisma generate"
   },
   "engines": {
     "node": "20.x"
