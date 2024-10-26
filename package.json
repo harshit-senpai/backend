@@ -5,9 +5,11 @@
   "main": "index.js",
   "scripts": {
     "watch": "tsc -w",
-    "server": "node dist/server.js",
+    "server": "nodemon dist/server.js",
     "dev": "concurrently \"npm run watch\" \"npm run server\"",
-    "postinstall": "prisma generate"
+    "build": "tsc",
+    "postinstall": "prisma generate",
+    "vercel-build": "prisma generate && tsc"
   },
   "engines": {
     "node": "20.x"
