@@ -8,8 +8,10 @@ import ordersRouter from "./routes/orders.route";
 import sizesRouter from "./routes/sizes.route";
 import addressRouter from "./routes/address.route";
 import searchRouter from "./routes/search.route";
+import cors from "cors"
 
 const app = express();
+app.use(cors())
 app.use(express.json());
 
 app.use("/api/categories", categoriesRouter);
