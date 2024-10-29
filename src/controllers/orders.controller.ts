@@ -161,18 +161,15 @@ export const getUserOrders = async (
   try {
     const { userId } = req.params;
 
-    const orders = await db.user.findUnique({
+    const orders = await db.order.findMany({
       where: {
-        id: userId,
+        userId: userId,
+        isPaid: true,
       },
       include: {
-        orders: {
+        orderItems: {
           include: {
-            orderItems: {
-              include: {
-                product: true,
-              },
-            },
+            product: true,
           },
         },
       },

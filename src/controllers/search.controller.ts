@@ -3,13 +3,15 @@ import { db } from "../lib/db";
 
 export const searchSearch = async (req: Request, res: Response) => {
   try {
-    const body = req.body;
-    const { title } = body;
+    const query = req.query;
+    const title = query.title as string;
+    console.log(query.title);
 
     const product = await db.product.findMany({
       where: {
         name: {
           contains: title,
+          mode: "insensitive",
         },
       },
     });

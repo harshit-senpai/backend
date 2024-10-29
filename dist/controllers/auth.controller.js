@@ -9,30 +9,40 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.searchSearch = void 0;
+exports.signUp = void 0;
 const db_1 = require("../lib/db");
-const searchSearch = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const signUp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const query = req.query;
-        const title = query.title;
-        console.log(query.title);
-        const product = yield db_1.db.product.findMany({
-            where: {
-                name: {
-                    contains: title,
-                    mode: "insensitive",
-                },
-            },
-        });
-        res.status(200).json({
+        const { name, email, password, phone } = req.body;
+        if (!name) {
+            res.status(400).json({
+                message: "user name is required",
+            });
+            return;
+        }
+        if (!email) {
+            res.status(400).json({
+                message: "User email is required",
+            });
+        }
+        if (!phone) {
+            res.status(200).json({
+                message: "User Phone number is required",
+            });
+        }
+        const newUser = yield db_1.db.user.create({
             data: {
-                product,
+                name,
+                email,
+                phone,
             },
         });
     }
     catch (error) {
-        console.log("[PRODUCT_SEARCH_ERROR]", error);
-        res.status(500).json("internal server error");
+        console.log("[SIGN_UP_ERROR]", error);
+        res.status(500).json({
+            message: "Internal server error",
+        });
     }
 });
-exports.searchSearch = searchSearch;
+exports.signUp = signUp;

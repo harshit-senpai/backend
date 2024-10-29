@@ -147,18 +147,15 @@ exports.verifyOrder = verifyOrder;
 const getUserOrders = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { userId } = req.params;
-        const orders = yield db_1.db.user.findUnique({
+        const orders = yield db_1.db.order.findMany({
             where: {
-                id: userId,
+                userId: userId,
+                isPaid: true,
             },
             include: {
-                orders: {
+                orderItems: {
                     include: {
-                        orderItems: {
-                            include: {
-                                product: true,
-                            },
-                        },
+                        product: true,
                     },
                 },
             },
