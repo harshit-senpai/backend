@@ -23,6 +23,9 @@ const searchSearch = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                     mode: "insensitive",
                 },
             },
+            include: {
+                images: true,
+            },
         });
         res.status(200).json({
             data: {

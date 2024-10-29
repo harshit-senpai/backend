@@ -5,7 +5,6 @@ export const searchSearch = async (req: Request, res: Response) => {
   try {
     const query = req.query;
     const title = query.title as string;
-    console.log(query.title);
 
     const product = await db.product.findMany({
       where: {
@@ -13,6 +12,9 @@ export const searchSearch = async (req: Request, res: Response) => {
           contains: title,
           mode: "insensitive",
         },
+      },
+      include: {
+        images: true,
       },
     });
 
