@@ -15,7 +15,6 @@ const searchSearch = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     try {
         const query = req.query;
         const title = query.title;
-        console.log(query.title);
         const product = yield db_1.db.product.findMany({
             where: {
                 name: {

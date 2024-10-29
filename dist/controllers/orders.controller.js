@@ -155,7 +155,11 @@ const getUserOrders = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             include: {
                 orderItems: {
                     include: {
-                        product: true,
+                        product: {
+                            include: {
+                                images: true,
+                            },
+                        },
                     },
                 },
             },

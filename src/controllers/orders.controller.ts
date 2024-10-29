@@ -169,7 +169,11 @@ export const getUserOrders = async (
       include: {
         orderItems: {
           include: {
-            product: true,
+            product: {
+              include: {
+                images: true,
+              },
+            },
           },
         },
       },
