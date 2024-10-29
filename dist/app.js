@@ -14,7 +14,9 @@ const address_route_1 = __importDefault(require("./routes/address.route"));
 const search_route_1 = __importDefault(require("./routes/search.route"));
 const cors_1 = __importDefault(require("cors"));
 const app = (0, express_1.default)();
-app.use((0, cors_1.default)());
+app.use((0, cors_1.default)({
+    origin: "*"
+}));
 app.use(express_1.default.json());
 app.use("/api/categories", categories_route_1.default);
 app.use("/api/image-upload", imageUpload_route_1.default);
