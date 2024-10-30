@@ -8,7 +8,7 @@ import ordersRouter from "./routes/orders.route";
 import sizesRouter from "./routes/sizes.route";
 import addressRouter from "./routes/address.route";
 import searchRouter from "./routes/search.route";
-import authRouter from "./routes/auth.route";
+// import authRouter from "./routes/auth.route";
 import favouriteRoute from "./routes/favourite.route";
 
 import cors from "cors";
@@ -29,7 +29,7 @@ app.use("/api/analytics", analyticsRouter);
 app.use("/api/address", addressRouter);
 app.use("/api/orders", ordersRouter);
 app.use("/api/search", searchRouter);
-app.use("/api/auth", authRouter);
+// app.use("/api/auth", authRouter);
 app.use("/api/favourite", favouriteRoute);
 
 export default app;
