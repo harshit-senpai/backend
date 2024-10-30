@@ -12,10 +12,12 @@ const orders_route_1 = __importDefault(require("./routes/orders.route"));
 const sizes_route_1 = __importDefault(require("./routes/sizes.route"));
 const address_route_1 = __importDefault(require("./routes/address.route"));
 const search_route_1 = __importDefault(require("./routes/search.route"));
+const auth_route_1 = __importDefault(require("./routes/auth.route"));
+const favourite_route_1 = __importDefault(require("./routes/favourite.route"));
 const cors_1 = __importDefault(require("cors"));
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)({
-    origin: "*"
+    origin: "*",
 }));
 app.use(express_1.default.json());
 app.use("/api/categories", categories_route_1.default);
@@ -26,4 +28,6 @@ app.use("/api/analytics", analytics_route_1.default);
 app.use("/api/address", address_route_1.default);
 app.use("/api/orders", orders_route_1.default);
 app.use("/api/search", search_route_1.default);
+app.use("/api/auth", auth_route_1.default);
+app.use("/api/favourite", favourite_route_1.default);
 exports.default = app;
