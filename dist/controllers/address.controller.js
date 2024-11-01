@@ -20,7 +20,7 @@ var __rest = (this && this.__rest) || function (s, e) {
     return t;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateUserAddress = exports.getUserAddressesById = exports.getUserAddresses = exports.createAddress = void 0;
+exports.setUserAddress = exports.updateUserAddress = exports.getUserAddressesById = exports.getUserAddresses = exports.createAddress = void 0;
 const db_1 = require("../lib/db");
 const createAddress = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -99,3 +99,45 @@ const updateUserAddress = (req, res) => __awaiter(void 0, void 0, void 0, functi
     }
 });
 exports.updateUserAddress = updateUserAddress;
+const setUserAddress = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { userId, addressId } = req.params;
+        if (!userId) {
+            res.status(400).json({
+                message: "User ID is requried",
+            });
+        }
+        if (!addressId) {
+            res.status(400).json({
+                message: "Address ID is required",
+            });
+            return;
+        }
+        yield db_1.db.address.updateMany({
+            where: {
+                userId: userId,
+            },
+            data: {
+                isShippingAddress: false,
+            },
+        });
+        const userAddress = yield db_1.db.address.update({
+            where: {
+                id: addressId,
+                userId: userId,
+            },
+            data: {
+                isShippingAddress: true,
+            },
+        });
+        res.status(200).json({
+            data: {
+                userAddress,
+            },
+        });
+    }
+    catch (error) {
+        console.log("[SET_ADDRESS_ERROR]");
+    }
+});
+exports.setUserAddress = setUserAddress;

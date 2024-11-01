@@ -96,3 +96,49 @@ export const updateUserAddress = async (
     });
   }
 };
+
+export const setUserAddress = async (req: Request, res: Response) => {
+  try {
+    const { userId, addressId } = req.params;
+
+    if (!userId) {
+      res.status(400).json({
+        message: "User ID is requried",
+      });
+    }
+
+    if (!addressId) {
+      res.status(400).json({
+        message: "Address ID is required",
+      });
+      return;
+    }
+
+    await db.address.updateMany({
+      where: {
+        userId: userId,
+      },
+      data: {
+        isShippingAddress: false,
+      },
+    });
+
+    const userAddress = await db.address.update({
+      where: {
+        id: addressId,
+        userId: userId,
+      },
+      data: {
+        isShippingAddress: true,
+      },
+    });
+
+    res.status(200).json({
+      data: {
+        userAddress,
+      },
+    });
+  } catch (error) {
+    console.log("[SET_ADDRESS_ERROR]");
+  }
+};

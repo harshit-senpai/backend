@@ -43,6 +43,26 @@ export const createOrder = async (
       return;
     }
 
+    for (const product of ShopProducts) {
+      const productInDb = await db.product.findUnique({
+        where: {
+          id: product.id,
+        },
+      });
+
+      if (!productInDb) {
+        res.status(400).json({
+          message: "Product ID not found",
+        });
+      }
+
+      if (product.quantity > (productInDb?.stock ?? 0)) {
+        res.status(400).json({
+          message: "Not enough product in stock",
+        });
+      }
+    }
+
     const user = await db.user.findUnique({
       where: {
         id: userId,
@@ -52,6 +72,7 @@ export const createOrder = async (
     const address = await db.address.findFirst({
       where: {
         userId: userId,
+        isShippingAddress: true,
       },
     });
 
@@ -128,6 +149,28 @@ export const verifyOrder = async (
         message: "Payment verification failed",
       });
       return;
+    }
+
+    const orderWithItems = await db.order.findUnique({
+      where: {
+        id: order,
+      },
+      include: {
+        orderItems: true,
+      },
+    });
+
+    for (const item of orderWithItems?.orderItems!) {
+      await db.product.update({
+        where: {
+          id: item.productId,
+        },
+        data: {
+          stock: {
+            decrement: item.quantity ?? 0,
+          },
+        },
+      });
     }
 
     await db.order.update({

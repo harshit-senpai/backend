@@ -8,4 +8,5 @@ const address_controller_1 = require("../controllers/address.controller");
 const router = express_1.default.Router();
 router.route("/").get(address_controller_1.getUserAddresses).post(address_controller_1.createAddress);
 router.route("/:addressId").get(address_controller_1.getUserAddressesById).patch(address_controller_1.updateUserAddress);
+router.route("/set-address/:userId/:addressId").patch(address_controller_1.setUserAddress);
 exports.default = router;
