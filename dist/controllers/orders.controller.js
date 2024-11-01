@@ -31,14 +31,14 @@ const generateSignature = (razorpayOrderId, razorpayPaymentId) => {
 const createOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b, _c, _d, _e, _f, _g, _h;
     try {
-        const { amount, productId, userId } = req.body;
+        const { amount, ShopProducts, userId } = req.body;
         if (!amount || isNaN(amount)) {
             res.status(400).json({
                 message: "Invalid Amount",
             });
             return;
         }
-        if (!productId || productId.length === 0) {
+        if (!ShopProducts || ShopProducts.length === 0) {
             res.status(400).json({
                 message: "Invalid Product ID",
             });
@@ -52,11 +52,6 @@ const createOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         const address = yield db_1.db.address.findFirst({
             where: {
                 userId: userId,
-            },
-        });
-        const products = yield db_1.db.product.findMany({
-            where: {
-                id: productId,
             },
         });
         const order = yield db_1.db.order.create({
@@ -77,7 +72,8 @@ const createOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
                     },
                 },
                 orderItems: {
-                    create: products.map((product) => ({
+                    create: ShopProducts.map((product) => ({
+                        quantity: product.quantity ? product.quantity : 1,
                         product: {
                             connect: {
                                 id: product.id,
@@ -150,7 +146,7 @@ const getUserOrders = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         const orders = yield db_1.db.order.findMany({
             where: {
                 userId: userId,
-                isPaid: true,
+                isPaid: false,
             },
             include: {
                 orderItems: {

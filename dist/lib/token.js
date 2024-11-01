@@ -12,9 +12,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.generateVerificationToken = void 0;
 const verificationToken_1 = require("../utils/verificationToken");
 const db_1 = require("./db");
-const uuid_1 = require("uuid");
 const generateVerificationToken = (email) => __awaiter(void 0, void 0, void 0, function* () {
-    const token = (0, uuid_1.v4)();
+    const token = Math.floor(1000 + Math.random() * 9000).toString();
     const expires = new Date(new Date().getTime() + 3600 * 1000);
     const existingToken = yield (0, verificationToken_1.getVerificationTokenByEmail)(email);
     if (existingToken) {

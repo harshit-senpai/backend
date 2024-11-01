@@ -95,6 +95,7 @@ model Order {
 
 model OrderItem {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  quantity  Int?
   orderId   String   @db.ObjectId
   order     Order    @relation(fields: [orderId], references: [id])
   productId String   @db.ObjectId
@@ -136,6 +137,15 @@ model Address {
 }
 
 model VerificationToken {
+  id      String   @id @default(auto()) @map("_id") @db.ObjectId
+  email   String
+  token   String   @unique
+  expires DateTime
+
+  @@unique([email, token])
+}
+
+model PasswordResetToken {
   id      String   @id @default(auto()) @map("_id") @db.ObjectId
   email   String
   token   String   @unique

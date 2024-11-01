@@ -27,7 +27,7 @@ export const createOrder = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { amount, productId, userId } = req.body;
+    const { amount, ShopProducts, userId } = req.body;
 
     if (!amount || isNaN(amount)) {
       res.status(400).json({
@@ -36,7 +36,7 @@ export const createOrder = async (
       return;
     }
 
-    if (!productId || productId.length === 0) {
+    if (!ShopProducts || ShopProducts.length === 0) {
       res.status(400).json({
         message: "Invalid Product ID",
       });
@@ -52,12 +52,6 @@ export const createOrder = async (
     const address = await db.address.findFirst({
       where: {
         userId: userId,
-      },
-    });
-
-    const products = await db.product.findMany({
-      where: {
-        id: productId,
       },
     });
 
@@ -79,7 +73,8 @@ export const createOrder = async (
           },
         },
         orderItems: {
-          create: products.map((product) => ({
+          create: ShopProducts.map((product: any) => ({
+            quantity: product.quantity ? product.quantity : 1,
             product: {
               connect: {
                 id: product.id,
@@ -164,7 +159,7 @@ export const getUserOrders = async (
     const orders = await db.order.findMany({
       where: {
         userId: userId,
-        isPaid: true,
+        isPaid: false,
       },
       include: {
         orderItems: {
