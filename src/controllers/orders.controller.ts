@@ -67,6 +67,7 @@ export const createOrder = async (
         state: address?.state ?? "",
         country: address?.country ?? "",
         pincode: address?.pincode ?? "",
+        amount: amount,
         user: {
           connect: {
             id: userId,
@@ -159,7 +160,7 @@ export const getUserOrders = async (
     const orders = await db.order.findMany({
       where: {
         userId: userId,
-        isPaid: false,
+        isPaid: true,
       },
       include: {
         orderItems: {

@@ -9,7 +9,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.generateVerificationToken = void 0;
+exports.generatePasswordResetToken = exports.generateVerificationToken = void 0;
+const passwordResetToken_1 = require("../utils/passwordResetToken");
 const verificationToken_1 = require("../utils/verificationToken");
 const db_1 = require("./db");
 const generateVerificationToken = (email) => __awaiter(void 0, void 0, void 0, function* () {
@@ -33,3 +34,24 @@ const generateVerificationToken = (email) => __awaiter(void 0, void 0, void 0, f
     return verificationToken;
 });
 exports.generateVerificationToken = generateVerificationToken;
+const generatePasswordResetToken = (email) => __awaiter(void 0, void 0, void 0, function* () {
+    const token = Math.floor(1000 + Math.random() * 9000).toString();
+    const expires = new Date(new Date().getTime() + 3600 * 1000);
+    const existingToken = yield (0, passwordResetToken_1.getPasswordResetTokenByEmail)(email);
+    if (existingToken) {
+        yield db_1.db.passwordResetToken.delete({
+            where: {
+                id: existingToken.id,
+            },
+        });
+    }
+    const passwordResetToken = yield db_1.db.passwordResetToken.create({
+        data: {
+            email,
+            token,
+            expires,
+        },
+    });
+    return passwordResetToken;
+});
+exports.generatePasswordResetToken = generatePasswordResetToken;

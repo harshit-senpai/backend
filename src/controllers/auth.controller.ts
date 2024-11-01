@@ -1,9 +1,12 @@
 // import { Request, Response } from "express";
 // import { db } from "../lib/db";
 // import bcrypt from "bcryptjs";
-// import { generateVerificationToken } from "../lib/token";
+// import {
+//   generatePasswordResetToken,
+//   generateVerificationToken,
+// } from "../lib/token";
 // import jwt from "jsonwebtoken";
-// import { sendVerificationEmail } from "../utils/mail";
+// import { resetPasswordEmail, sendVerificationEmail } from "../utils/mail";
 // import { getVerificationTokenByToken } from "../utils/verificationToken";
 
 // const signToken = (id: string) => {
@@ -234,6 +237,44 @@
 //     console.log("[LOGOUT_ERROR]", error);
 //     res.status(500).json({
 //       message: "internal server error",
+//     });
+//   }
+// };
+
+// export const rest = async (req: Request, res: Response) => {
+//   try {
+//     const { email } = req.body();
+
+//     if (!email) {
+//       res.status(400).json({
+//         message: "Email does not exists",
+//       });
+//       return;
+//     }
+
+//     const existingUser = await db.user.findUnique({
+//       where: {
+//         email,
+//       },
+//     });
+
+//     if (!existingUser) {
+//       res.status(404).json({
+//         message: "User with this email does not exists",
+//       });
+//       return;
+//     }
+
+//     const passwordResetToken = await generatePasswordResetToken(email);
+
+//     await resetPasswordEmail(
+//       passwordResetToken.email,
+//       passwordResetToken.token
+//     );
+//   } catch (error) {
+//     console.log("[RESET_ERROR]", error);
+//     res.status(500).json({
+//       message: "Internal server error",
 //     });
 //   }
 // };

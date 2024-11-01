@@ -12,3 +12,14 @@
 //     html: `<p>your OTP is: ${confirmationLink}.</p>`,
 //   });
 // };
+
+// export const resetPasswordEmail = async (email: string, token: string) => {
+//   const link = token;
+
+//   await resend.emails.send({
+//     from: "onboarding@resend.dev",
+//     to: email,
+//     subject: "Rest your password",
+//     html: `<p>your OTP is: ${link}.</p>`,
+//   });
+// };
