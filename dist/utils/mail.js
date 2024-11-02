@@ -1,21 +1,34 @@
 "use strict";
-// import { Resend } from "resend";
-// const resend = new Resend(process.env.RESEND_API_KEY);
-// export const sendVerificationEmail = async (email: string, token: string) => {
-//   const confirmationLink = token;
-//   await resend.emails.send({
-//     from: "onboarding@resend.dev",
-//     to: email,
-//     subject: "Confirm your email",
-//     html: `<p>your OTP is: ${confirmationLink}.</p>`,
-//   });
-// };
-// export const resetPasswordEmail = async (email: string, token: string) => {
-//   const link = token;
-//   await resend.emails.send({
-//     from: "onboarding@resend.dev",
-//     to: email,
-//     subject: "Rest your password",
-//     html: `<p>your OTP is: ${link}.</p>`,
-//   });
-// };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.resetPasswordEmail = exports.sendVerificationEmail = void 0;
+const resend_1 = require("resend");
+const resend = new resend_1.Resend(process.env.RESEND_API_KEY);
+const sendVerificationEmail = (email, token) => __awaiter(void 0, void 0, void 0, function* () {
+    const confirmationLink = token;
+    yield resend.emails.send({
+        from: "onboarding@resend.dev",
+        to: email,
+        subject: "Confirm your email",
+        html: `<p>your OTP is: ${confirmationLink}.</p>`,
+    });
+});
+exports.sendVerificationEmail = sendVerificationEmail;
+const resetPasswordEmail = (email, token) => __awaiter(void 0, void 0, void 0, function* () {
+    const link = token;
+    yield resend.emails.send({
+        from: "onboarding@resend.dev",
+        to: email,
+        subject: "Rest your password",
+        html: `<p>your OTP is: ${link}.</p>`,
+    });
+});
+exports.resetPasswordEmail = resetPasswordEmail;
