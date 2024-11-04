@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response, NextFunction } from "express";
 
 import categoriesRouter from "./routes/categories.route";
 import imageUploadRouter from "./routes/imageUpload.route";
@@ -20,6 +20,14 @@ app.use(
   })
 );
 app.use(express.json());
+
+app.use((req: Request, res: Response, next: NextFunction) => {
+  if (process.env.MAINTENANCE_MODE === "true") {
+    res.status(503).send("Service temporarily unavailable");
+    return;
+  }
+  next();
+});
 
 app.use("/api/categories", categoriesRouter);
 app.use("/api/image-upload", imageUploadRouter);
