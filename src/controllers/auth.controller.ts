@@ -7,7 +7,10 @@ import {
 } from "../lib/token";
 import jwt from "jsonwebtoken";
 import { resetPasswordEmail, sendVerificationEmail } from "../utils/mail";
-import { getVerificationTokenByToken } from "../utils/verificationToken";
+import {
+  getVerificationTokenByEmail,
+  getVerificationTokenByToken,
+} from "../utils/verificationToken";
 import {
   getPasswordResetTokenByEmail,
   getPasswordResetTokenByToken,
@@ -95,6 +98,20 @@ export const signUp = async (req: Request, res: Response): Promise<void> => {
 
     const verificationToken = await generateVerificationToken(email);
 
+    const existingTempUser = await db.tempUser.findUnique({
+      where: {
+        email,
+      },
+    });
+
+    if (existingTempUser) {
+      await db.tempUser.delete({
+        where: {
+          email,
+        },
+      });
+    }
+
     await db.tempUser.create({
       data: {
         name,
@@ -126,7 +143,7 @@ export const newVerification = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { token } = req.params;
+    const { token } = req.body;
 
     const tempUser = await db.tempUser.findUnique({
       where: {
@@ -414,6 +431,87 @@ export const newPassword = async (req: Request, res: Response) => {
     console.log("[NEW_PASSWORD_ERROR]", error);
     res.status(500).json({
       message: "Internal Server Error",
+    });
+  }
+};
+
+export const resendEmailVerificationOtp = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      res.status(400).json({
+        message: "Email is required to resend the confermation OTP",
+      });
+      return;
+    }
+
+    const existingToken = await getVerificationTokenByEmail(email);
+
+    if (!existingToken) {
+      res.status(200).json({
+        message: "Associated Email does not exists",
+      });
+      return;
+    }
+
+    const hasExpired = new Date(existingToken.expires) < new Date();
+
+    if (hasExpired) {
+      const newVerificationToken = await generateVerificationToken(email);
+
+      await sendVerificationEmail(
+        newVerificationToken.email,
+        newVerificationToken.token
+      );
+
+      await db.tempUser.update({
+        where: {
+          email: newVerificationToken.email,
+        },
+        data: {
+          token: newVerificationToken.token,
+        },
+      });
+
+      res.status(200).json({
+        message: "verification email sent",
+      });
+      return;
+    }
+
+    await db.verificationToken.delete({
+      where: {
+        id: existingToken.id,
+      },
+    });
+
+    const newVerificationToken = await generateVerificationToken(email);
+
+    await db.tempUser.update({
+      where: {
+        email: newVerificationToken.email,
+      },
+      data: {
+        token: newVerificationToken.token,
+      },
+    });
+
+    await sendVerificationEmail(
+      newVerificationToken.email,
+      newVerificationToken.token
+    );
+
+    res.status(200).json({
+      message: "verification email sent",
+    });
+  } catch (error) {
+    console.log("[RESEND_EMAIL_VERIFICATION_OTP]", error);
+    res.status(500).json({
+      message: "Internal server error",
     });
   }
 };

@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.newPassword = exports.verifyOtp = exports.reset = exports.logOut = exports.signin = exports.newVerification = exports.signUp = void 0;
+exports.resendEmailVerificationOtp = exports.newPassword = exports.verifyOtp = exports.reset = exports.logOut = exports.signin = exports.newVerification = exports.signUp = void 0;
 const db_1 = require("../lib/db");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const token_1 = require("../lib/token");
@@ -81,6 +81,18 @@ const signUp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         }
         const hashPassword = yield bcryptjs_1.default.hash(password, 10);
         const verificationToken = yield (0, token_1.generateVerificationToken)(email);
+        const existingTempUser = yield db_1.db.tempUser.findUnique({
+            where: {
+                email,
+            },
+        });
+        if (existingTempUser) {
+            yield db_1.db.tempUser.delete({
+                where: {
+                    email,
+                },
+            });
+        }
         yield db_1.db.tempUser.create({
             data: {
                 name,
@@ -105,7 +117,7 @@ const signUp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 exports.signUp = signUp;
 const newVerification = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { token } = req.params;
+        const { token } = req.body;
         const tempUser = yield db_1.db.tempUser.findUnique({
             where: {
                 token,
@@ -350,3 +362,63 @@ const newPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
 });
 exports.newPassword = newPassword;
+const resendEmailVerificationOtp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { email } = req.body;
+        if (!email) {
+            res.status(400).json({
+                message: "Email is required to resend the confermation OTP",
+            });
+            return;
+        }
+        const existingToken = yield (0, verificationToken_1.getVerificationTokenByEmail)(email);
+        if (!existingToken) {
+            res.status(200).json({
+                message: "Associated Email does not exists",
+            });
+            return;
+        }
+        const hasExpired = new Date(existingToken.expires) < new Date();
+        if (hasExpired) {
+            const newVerificationToken = yield (0, token_1.generateVerificationToken)(email);
+            yield (0, mail_1.sendVerificationEmail)(newVerificationToken.email, newVerificationToken.token);
+            yield db_1.db.tempUser.update({
+                where: {
+                    email: newVerificationToken.email,
+                },
+                data: {
+                    token: newVerificationToken.token,
+                },
+            });
+            res.status(200).json({
+                message: "verification email sent",
+            });
+            return;
+        }
+        yield db_1.db.verificationToken.delete({
+            where: {
+                id: existingToken.id,
+            },
+        });
+        const newVerificationToken = yield (0, token_1.generateVerificationToken)(email);
+        yield db_1.db.tempUser.update({
+            where: {
+                email: newVerificationToken.email,
+            },
+            data: {
+                token: newVerificationToken.token,
+            },
+        });
+        yield (0, mail_1.sendVerificationEmail)(newVerificationToken.email, newVerificationToken.token);
+        res.status(200).json({
+            message: "verification email sent",
+        });
+    }
+    catch (error) {
+        console.log("[RESEND_EMAIL_VERIFICATION_OTP]", error);
+        res.status(500).json({
+            message: "Internal server error",
+        });
+    }
+});
+exports.resendEmailVerificationOtp = resendEmailVerificationOtp;
