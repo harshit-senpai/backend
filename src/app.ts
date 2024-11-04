@@ -21,13 +21,13 @@ app.use(
 );
 app.use(express.json());
 
-app.use((req: Request, res: Response, next: NextFunction) => {
-  if (process.env.MAINTENANCE_MODE === "true") {
-    res.status(503).send("Service temporarily unavailable");
-    return;
-  }
-  next();
-});
+// app.use((req: Request, res: Response, next: NextFunction) => {
+//   if (process.env.MAINTENANCE_MODE === "true") {
+//     res.status(503).send("Service temporarily unavailable");
+//     return;
+//   }
+//   next();
+// });
 
 app.use("/api/categories", categoriesRouter);
 app.use("/api/image-upload", imageUploadRouter);
