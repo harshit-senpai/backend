@@ -266,6 +266,7 @@ exports.reset = reset;
 const verifyOtp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { token } = req.body;
+        console.log(token);
         const existingToken = yield (0, passwordResetToken_1.getPasswordResetTokenByToken)(token);
         if (!existingToken) {
             res.status(404).json({

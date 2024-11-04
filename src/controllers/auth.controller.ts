@@ -317,6 +317,7 @@ export const reset = async (req: Request, res: Response) => {
 export const verifyOtp = async (req: Request, res: Response) => {
   try {
     const { token } = req.body;
+    console.log(token)
     const existingToken = await getPasswordResetTokenByToken(token);
 
     if (!existingToken) {
