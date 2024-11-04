@@ -1,12 +1,18 @@
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_PASS,
+  },
+});
 
 export const sendVerificationEmail = async (email: string, token: string) => {
   const confirmationLink = token;
 
-  await resend.emails.send({
-    from: "onboarding@resend.dev",
+  await transporter.sendMail({
+    from: process.env.GMAIL_USER,
     to: email,
     subject: "Confirm your email",
     html: `<p>your OTP is: ${confirmationLink}.</p>`,
@@ -16,8 +22,8 @@ export const sendVerificationEmail = async (email: string, token: string) => {
 export const resetPasswordEmail = async (email: string, token: string) => {
   const link = token;
 
-  await resend.emails.send({
-    from: "onboarding@resend.dev",
+  await transporter.sendMail({
+    from: process.env.GMAIL_USER,
     to: email,
     subject: "Rest your password",
     html: `<p>your OTP is: ${link}.</p>`,

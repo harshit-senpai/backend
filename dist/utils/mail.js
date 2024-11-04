@@ -8,14 +8,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.resetPasswordEmail = exports.sendVerificationEmail = void 0;
-const resend_1 = require("resend");
-const resend = new resend_1.Resend(process.env.RESEND_API_KEY);
+const nodemailer_1 = __importDefault(require("nodemailer"));
+const transporter = nodemailer_1.default.createTransport({
+    service: "gmail",
+    auth: {
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_PASS,
+    },
+});
 const sendVerificationEmail = (email, token) => __awaiter(void 0, void 0, void 0, function* () {
     const confirmationLink = token;
-    yield resend.emails.send({
-        from: "onboarding@resend.dev",
+    yield transporter.sendMail({
+        from: process.env.GMAIL_USER,
         to: email,
         subject: "Confirm your email",
         html: `<p>your OTP is: ${confirmationLink}.</p>`,
@@ -24,8 +33,8 @@ const sendVerificationEmail = (email, token) => __awaiter(void 0, void 0, void 0
 exports.sendVerificationEmail = sendVerificationEmail;
 const resetPasswordEmail = (email, token) => __awaiter(void 0, void 0, void 0, function* () {
     const link = token;
-    yield resend.emails.send({
-        from: "onboarding@resend.dev",
+    yield transporter.sendMail({
+        from: process.env.GMAIL_USER,
         to: email,
         subject: "Rest your password",
         html: `<p>your OTP is: ${link}.</p>`,
